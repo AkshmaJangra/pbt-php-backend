@@ -1,0 +1,115 @@
+<?php
+include_once(__DIR__ . "/../cors.php");
+include_once(__DIR__ . "/../conn.php");
+
+// ✅ Check DB connection
+if ($conn->connect_error) {
+    echo json_encode(["status" => "error", "message" => "Database connection failed"]);
+    exit;
+}
+// Safely get ID
+$id = isset($_REQUEST['id']) ? intval($_REQUEST['id']) : 0;
+
+if ($id <= 0) {
+    echo json_encode(["status" => "error", "message" => "ID required"]);
+    exit;
+}
+
+
+$id = intval($_POST['id']);
+$title = $_POST['title'] ?? '';
+$slug = $_POST['slug'] ?? '';
+$status = $_POST['status'] ?? '';
+$description = $_POST['description'] ?? '';
+$subdes1 = $_POST['subdes1'] ?? '';
+$subdes2 = $_POST['subdes2'] ?? '';
+$subdes3 = $_POST['subdes3'] ?? '';
+
+// ✅ Directory for uploads
+$uploadDir = __DIR__ . "/../uploads/";
+if (!file_exists($uploadDir)) {
+    mkdir($uploadDir, 0777, true);
+}
+
+// ✅ Function to handle file uploads
+function uploadFile($fieldName) {
+    if (!empty($_FILES[$fieldName]['name'])) {
+        $filePath = "uploads/" . time() . "_" . basename($_FILES[$fieldName]['name']);
+        $targetPath = __DIR__ . "/../" . $filePath;
+        if (move_uploaded_file($_FILES[$fieldName]['tmp_name'], $targetPath)) {
+            return $filePath;
+        }
+    }
+    return null;
+}
+
+// ✅ Upload files
+$image = uploadFile("image");
+$sub_image1 = uploadFile("sub_image1");
+$sub_image2 = uploadFile("sub_image2");
+$sub_image3 = uploadFile("sub_image3");
+$banner_image = uploadFile("banner_image");
+
+// ✅ Build query dynamically
+$sql = "UPDATE blogs SET 
+    title=?, slug=?, status=?, description=?, subdes1=?, subdes2=?, subdes3=?";
+
+$params = [$title, $slug, $status, $description, $subdes1, $subdes2, $subdes3];
+
+// Add optional fields
+if ($image) {
+    $sql .= ", image=?";
+    $params[] = $image;
+}
+if ($sub_image1) {
+    $sql .= ", sub_image1=?";
+    $params[] = $sub_image1;
+}
+if ($sub_image2) {
+    $sql .= ", sub_image2=?";
+    $params[] = $sub_image2;
+}
+if ($sub_image3) {
+    $sql .= ", sub_image3=?";
+    $params[] = $sub_image3;
+}
+if ($banner_image) {
+    $sql .= ", banner_image=?";
+    $params[] = $banner_image;
+}
+
+// Add WHERE clause
+$sql .= " WHERE id=?";
+$params[] = $id;
+
+// ✅ Generate types string dynamically
+$types = "";
+foreach ($params as $p) {
+    if (is_int($p)) {
+        $types .= "i";
+    } elseif (is_float($p) || is_double($p)) {
+        $types .= "d";
+    } else {
+        $types .= "s";
+    }
+}
+
+// ✅ Prepare and bind
+$stmt = $conn->prepare($sql);
+if (!$stmt) {
+    echo json_encode(["status" => "error", "message" => "SQL prepare failed"]);
+    exit;
+}
+
+$stmt->bind_param($types, ...$params);
+
+// ✅ Execute
+if ($stmt->execute()) {
+    echo json_encode(["status" => "success", "message" => "Blog updated successfully"]);
+} else {
+    echo json_encode(["status" => "error", "message" => "Failed to update blog"]);
+}
+
+$stmt->close();
+$conn->close();
+?>
