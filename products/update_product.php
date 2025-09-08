@@ -21,8 +21,8 @@ $slug = $_POST['slug'] ?? '';
 $status = $_POST['status'] ?? '';
 $description = $_POST['description'] ?? '';
 $category = $_POST['category'] ?? null; // nullable
-$price = $_POST['price'] ?? null;
-$targetspecies = $_POST['targetspecies'] ?? '';
+$division = $_POST['division'] ?? null; // nullable
+$targetspecies = $_POST['targetspecies'] ?? null;
 $indications = $_POST['indications'] ?? '';
 $composition = $_POST['composition'] ?? '';
 $dosages = $_POST['dosages'] ?? '';
@@ -59,12 +59,12 @@ if (!empty($_FILES['icon_image']['name'])) {
 
 // ✅ Build query dynamically
 $sql = "UPDATE products SET 
-    title=?, slug=?, status=?, description=?, category=?, price=?, 
+    title=?, slug=?, status=?, description=?, category=?,division=?,
     targetspecies=?, indications=?, composition=?, dosages=?, 
     packsize=?, pharmacautionform=?";
 
 $params = [
-    $title, $slug, $status, $description, $category, $price,
+    $title, $slug, $status, $description, $category,$division,
     $targetspecies, $indications, $composition, $dosages,
     $packsize, $pharmacautionform
 ];

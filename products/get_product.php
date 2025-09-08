@@ -5,6 +5,8 @@ include_once(__DIR__ . "/../cors.php");
 include_once(__DIR__ . "/../conn.php");
 
 $sql = "SELECT * FROM products";
+$sql .= " ORDER BY created_at DESC";
+
 $result = $conn->query($sql);
 
 $products = [];

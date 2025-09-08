@@ -16,9 +16,9 @@ function generateUniqueProductId($conn) {
 $title = $_POST['title'] ?? null;
 $status = $_POST['status'] ?? null;
 $description = $_POST['description'] ?? null;
-$price = $_POST['price'] ?? null;
-$targetspecies = $_POST['targetspecies'] ?? null;
+$targetspecies = $_POST['targetspecies'] ?? 'All';
 $category = $_POST['category'] ?? null;
+$division = $_POST['division'] ?? null;
 $indications = $_POST['indications'] ?? null;
 $composition = $_POST['composition'] ?? null;
 $dosages = $_POST['dosages'] ?? null;
@@ -27,6 +27,9 @@ $pharmacautionform = $_POST['pharmacautionform'] ?? null;
 $slug = $_POST['slug'] ?? null;
 
 $image = null;
+$other_images = [];
+$technical_enquiry = null;
+$pack_insert = null;
 $icon_image = null;
 
 // Upload directory (absolute path)
@@ -51,22 +54,55 @@ if (!empty($_FILES['icon_image']['name'])) {
         $icon_image = "uploads/" . $filename;
     }
 }
+// ✅ Handle multiple other images
+if (!empty($_FILES['other_images']['name'][0])) {
+    foreach ($_FILES['other_images']['name'] as $key => $val) {
+        if (!empty($val)) {
+            $filename = time() . "_" . basename($val);
+            $targetPath = $uploadDir . $filename;
+            if (move_uploaded_file($_FILES['other_images']['tmp_name'][$key], $targetPath)) {
+                $other_images[] = "uploads/" . $filename;
+            }
+        }
+    }
+}
+// ✅ Handle PDFs
+if (!empty($_FILES['pack_insert']['name'])) {
+    if (strtolower(pathinfo($_FILES['pack_insert']['name'], PATHINFO_EXTENSION)) === "pdf") {
+        $filename = time() . "_" . basename($_FILES['pack_insert']['name']);
+        $targetPath = $uploadDir . $filename;
+        if (move_uploaded_file($_FILES['pack_insert']['tmp_name'], $targetPath)) {
+            $pack_insert = "uploads/" . $filename;
+        }
+    }
+}
+if (!empty($_FILES['technical_enquiry']['name'])) {
+    if (strtolower(pathinfo($_FILES['technical_enquiry']['name'], PATHINFO_EXTENSION)) === "pdf") {
+        $filename = time() . "_" . basename($_FILES['technical_enquiry']['name']);
+        $targetPath = $uploadDir . $filename;
+        if (move_uploaded_file($_FILES['technical_enquiry']['tmp_name'], $targetPath)) {
+            $technical_enquiry = "uploads/" . $filename;
+        }
+    }
+}
 
 $id = generateUniqueProductId($conn);
+// Store other_images as JSON (better than comma separated)
+$other_images_json = json_encode($other_images);
 
 $sql = "INSERT INTO products 
-(id, title, status, description, category, price, targetspecies, indications, composition, dosages, packsize, pharmacautionform, slug, image, icon_image) 
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+(id, title, status, description, category, division, targetspecies, indications, composition, dosages, packsize, pharmacautionform, slug, image, icon_image, other_images, pack_insert, technical_enquiry) 
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 $stmt = $conn->prepare($sql);
 $stmt->bind_param(
-    "sssssssssssssss",
+   "ssssssssssssssssss", // 18 fields
     $id,
     $title,
     $status,
     $description,
     $category,
-    $price,
+    $division,
     $targetspecies,
     $indications,
     $composition,
@@ -75,8 +111,12 @@ $stmt->bind_param(
     $pharmacautionform,
     $slug,
     $image,
-    $icon_image
+    $icon_image,
+    $other_images_json,
+    $pack_insert,
+    $technical_enquiry
 );
+
 
 if ($stmt->execute()) {
     echo json_encode(["status" => "success", "message" => "Product added", "id" => $id]);
