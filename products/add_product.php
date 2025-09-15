@@ -15,6 +15,7 @@ function generateUniqueProductId($conn) {
 // Collect POST data
 $title = $_POST['title'] ?? null;
 $status = $_POST['status'] ?? null;
+$showin_home = $_POST['showin_home'] ?? null;
 $description = $_POST['description'] ?? null;
 $targetspecies = $_POST['targetspecies'] ?? 'All';
 $category = $_POST['category'] ?? null;
@@ -91,15 +92,16 @@ $id = generateUniqueProductId($conn);
 $other_images_json = json_encode($other_images);
 
 $sql = "INSERT INTO products 
-(id, title, status, description, category, division, targetspecies, indications, composition, dosages, packsize, pharmacautionform, slug, image, icon_image, other_images, pack_insert, technical_enquiry) 
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+(id, title, status,showin_home, description, category, division, targetspecies, indications, composition, dosages, packsize, pharmacautionform, slug, image, icon_image, other_images, pack_insert, technical_enquiry) 
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)";
 
 $stmt = $conn->prepare($sql);
 $stmt->bind_param(
-   "ssssssssssssssssss", // 18 fields
+   "sssssssssssssssssss", // 18 fields
     $id,
     $title,
     $status,
+    $showin_home,
     $description,
     $category,
     $division,

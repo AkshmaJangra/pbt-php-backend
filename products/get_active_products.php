@@ -6,6 +6,7 @@ include_once(__DIR__ . "/../conn.php");
 $targetspecies = isset($_GET['targetspecies']) && $_GET['targetspecies'] !== '' ? $_GET['targetspecies'] : null;
 $category = isset($_GET['category']) && $_GET['category'] !== '' ? $_GET['category'] : null;
 $division = isset($_GET['division']) && $_GET['division'] !== '' ? $_GET['division'] : null;
+$showin_home = isset($_GET['showin_home']) && $_GET['showin_home'] !== '' ? $_GET['showin_home'] : null;
 
 // Base query: fetch only active products
 $sql = "SELECT * FROM products WHERE status = 'active'";
@@ -16,7 +17,7 @@ if ($category != null) {
     $sql .= " AND category = '$category'";
 }
 
-if ($targetspecies) {
+if ($targetspecies && $targetspecies!=='All') {
     $targetspecies = $conn->real_escape_string($targetspecies);
     // Use FIND_IN_SET for comma-separated values in targetspecies column
     $sql .= " AND FIND_IN_SET('$targetspecies', targetspecies) > 0";
@@ -25,6 +26,10 @@ if ($targetspecies) {
 if ($division) {
     $division = $conn->real_escape_string($division);
     $sql .= " AND division = '$division'";
+}
+if ($showin_home) {
+   $sql = "SELECT * FROM products WHERE showin_home = 'active'";
+
 }
 $sql .= " ORDER BY created_at DESC";
 
