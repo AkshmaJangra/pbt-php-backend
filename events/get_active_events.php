@@ -2,13 +2,11 @@
 include_once(__DIR__ . "/../cors.php");
 include_once(__DIR__ . "/../conn.php");
 
+// Fetch only active events
+$sql = "SELECT id, title, description, slug, image, status, gallery_images 
+        FROM events 
+        WHERE status = 'active'";
 
-$status = isset($_GET['status']) ? $_GET['status'] : '';
-
-$sql = "SELECT id, title, description, slug, image, status,gallery_images FROM events";
-if ($status === 'active') {
-    $sql .= " WHERE status = 'active'";
-}
 $result = $conn->query($sql);
 
 $events = [];
@@ -17,5 +15,6 @@ while ($row = $result->fetch_assoc()) {
 }
 
 echo json_encode(["status" => "success", "data" => $events]);
+
 $conn->close();
 ?>

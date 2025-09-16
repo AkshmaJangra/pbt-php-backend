@@ -35,7 +35,26 @@ if (!empty($_FILES['image']['name'])) {
         exit;
     }
 }
-
+$gallery_images = null;
+if (!empty($_FILES['gallery_images']['name'][0])) {
+    $uploadedImages = [];
+    $fileCount = count($_FILES['gallery_images']['name']);
+    
+    for ($i = 0; $i < $fileCount; $i++) {
+        if (!empty($_FILES['gallery_images']['name'][$i])) {
+            $fileName = "uploads/" . time() . "_" . $i . "_" . basename($_FILES['gallery_images']['name'][$i]);
+            $targetPath = __DIR__ . "/../" . $fileName;
+            
+            if (move_uploaded_file($_FILES['gallery_images']['tmp_name'][$i], $targetPath)) {
+                $uploadedImages[] = $fileName;
+            }
+        }
+    }
+    
+    if (!empty($uploadedImages)) {
+        $gallery_images = json_encode($uploadedImages);
+    }
+}
 
 $sql = "UPDATE events SET title=?,slug=?, description=?, status=?";
 $params = [
@@ -46,7 +65,10 @@ if ($image) {
     $params[] = $image;
 
 }
-
+if ($gallery_images) {
+    $sql .= ", gallery_images=?";
+    $params[] = $gallery_images;
+}
 $sql .= " WHERE id=?";
 $params[] = $id;
 // ✅ Generate types string dynamically
