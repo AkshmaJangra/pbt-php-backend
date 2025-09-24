@@ -27,6 +27,8 @@ $subdes3 = $_POST['subdes3'] ?? '';
 $subdes4 = $_POST['subdes4'] ?? '';
 $subdes5 = $_POST['subdes5'] ?? '';
 $subdes6 = $_POST['subdes6'] ?? '';
+$subdes7 = $_POST['subdes7'] ?? '';
+$subdes8 = $_POST['subdes8'] ?? '';
 
 // ✅ Directory for uploads
 $uploadDir = __DIR__ . "/../uploads/";
@@ -54,13 +56,15 @@ $sub_image3 = uploadFile("sub_image3");
 $sub_image4 = uploadFile("sub_image4");
 $sub_image5 = uploadFile("sub_image5");
 $sub_image6 = uploadFile("sub_image6");
+$sub_image7 = uploadFile("sub_image7");
+$sub_image8 = uploadFile("sub_image8");
 $banner_image = uploadFile("banner_image");
 
 // ✅ Build query dynamically
 $sql = "UPDATE blogs SET 
-    title=?, slug=?, status=?, description=?, subdes1=?, subdes2=?, subdes3=?, subdes4=?, subdes5=?, subdes6=?";
+    title=?, slug=?, status=?, description=?, subdes1=?, subdes2=?, subdes3=?, subdes4=?, subdes5=?, subdes6=?,subdes7=?,subdes8=?";
 
-$params = [$title, $slug, $status, $description, $subdes1, $subdes2, $subdes3,$subdes4, $subdes5, $subdes6];
+$params = [$title, $slug, $status, $description, $subdes1, $subdes2, $subdes3,$subdes4, $subdes5, $subdes6,$subdes7,$subdes8];
 
 // Add optional fields
 if ($image) {
@@ -90,6 +94,14 @@ if ($sub_image5) {
 if ($sub_image6) {
     $sql .= ", sub_image6=?";
     $params[] = $sub_image6;
+}
+if ($sub_image7) {
+    $sql .= ", sub_image7=?";
+    $params[] = $sub_image7;
+}
+if ($sub_image8) {
+    $sql .= ", sub_image8=?";
+    $params[] = $sub_image8;
 }
 if ($banner_image) {
     $sql .= ", banner_image=?";
