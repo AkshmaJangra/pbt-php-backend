@@ -26,6 +26,9 @@ $dosages = $_POST['dosages'] ?? null;
 $packsize = $_POST['packsize'] ?? null;
 $pharmacautionform = $_POST['pharmacautionform'] ?? null;
 $slug = $_POST['slug'] ?? null;
+$meta_title = $_POST['meta_title'] ?? null;
+$meta_description = $_POST['meta_description'] ?? null;
+
 
 $image = null;
 $other_images = [];
@@ -92,12 +95,12 @@ $id = generateUniqueProductId($conn);
 $other_images_json = json_encode($other_images);
 
 $sql = "INSERT INTO products 
-(id, title, status,showin_home, description, category, division, targetspecies, indications, composition, dosages, packsize, pharmacautionform, slug, image, icon_image, other_images, pack_insert, technical_enquiry) 
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)";
+(id, title, status,showin_home, description, category, division, targetspecies, indications, composition, dosages, packsize, pharmacautionform, slug, image, icon_image, other_images, pack_insert, technical_enquiry,meta_description,meta_title) 
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?)";
 
 $stmt = $conn->prepare($sql);
 $stmt->bind_param(
-   "sssssssssssssssssss", // 18 fields
+   "sssssssssssssssssssss", // 18 fields
     $id,
     $title,
     $status,
@@ -116,7 +119,9 @@ $stmt->bind_param(
     $icon_image,
     $other_images_json,
     $pack_insert,
-    $technical_enquiry
+    $technical_enquiry,
+    $meta_description,
+    $meta_title
 );
 
 

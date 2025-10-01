@@ -28,14 +28,25 @@ $composition = $_POST['composition'] ?? '';
 $dosages = $_POST['dosages'] ?? '';
 $packsize = $_POST['packsize'] ?? '';
 $pharmacautionform = $_POST['pharmacautionform'] ?? '';
+$meta_description = $_POST['meta_description'] ?? '';
+$meta_title = $_POST['meta_title'] ?? '';
 
-// ✅ Check if slug already exists for a different product
-if (!empty($slug)) {
+// ✅ Get current slug
+$currentSlug = '';
+$getSlug = $conn->prepare("SELECT slug FROM products WHERE id=?");
+$getSlug->bind_param("i", $id);
+$getSlug->execute();
+$getSlug->bind_result($currentSlug);
+$getSlug->fetch();
+$getSlug->close();
+
+// ✅ Check if slug is being changed
+if (!empty($slug) && $slug !== $currentSlug) {
     $checkSlug = $conn->prepare("SELECT id FROM products WHERE slug = ? AND id != ?");
     $checkSlug->bind_param("si", $slug, $id);
     $checkSlug->execute();
     $result = $checkSlug->get_result();
-    
+
     if ($result->num_rows > 0) {
         echo json_encode(["status" => "error", "message" => "Slug already exists for another product"]);
         exit;
@@ -76,18 +87,15 @@ $other_images = null;
 if (!empty($_FILES['other_images']['name'][0])) {
     $uploadedImages = [];
     $fileCount = count($_FILES['other_images']['name']);
-    
     for ($i = 0; $i < $fileCount; $i++) {
         if (!empty($_FILES['other_images']['name'][$i])) {
             $fileName = "uploads/" . time() . "_" . $i . "_" . basename($_FILES['other_images']['name'][$i]);
             $targetPath = __DIR__ . "/../" . $fileName;
-            
             if (move_uploaded_file($_FILES['other_images']['tmp_name'][$i], $targetPath)) {
                 $uploadedImages[] = $fileName;
             }
         }
     }
-    
     if (!empty($uploadedImages)) {
         $other_images = json_encode($uploadedImages);
     }
@@ -117,15 +125,21 @@ if (!empty($_FILES['technical_enquiry']['name'])) {
 
 // ✅ Build query dynamically
 $sql = "UPDATE products SET 
-    title=?, slug=?, status=?, showin_home=?, description=?, category=?, division=?,
+    title=?, status=?, showin_home=?, description=?, category=?, division=?,
     targetspecies=?, indications=?, composition=?, dosages=?, 
-    packsize=?, pharmacautionform=?";
+    packsize=?, pharmacautionform=?, meta_description=?, meta_title=?";
 
 $params = [
-    $title, $slug, $status, $showin_home, $description, $category, $division,
+    $title, $status, $showin_home, $description, $category, $division,
     $targetspecies, $indications, $composition, $dosages,
-    $packsize, $pharmacautionform
+    $packsize, $pharmacautionform, $meta_description, $meta_title
 ];
+
+// ✅ Only update slug if it was changed
+if (!empty($slug) && $slug !== $currentSlug) {
+    $sql .= ", slug=?";
+    $params[] = $slug;
+}
 
 // Add optional fields only if they're being updated
 if ($image) {
