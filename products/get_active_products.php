@@ -8,32 +8,41 @@ $category = isset($_GET['category']) && $_GET['category'] !== '' ? $_GET['catego
 $division = isset($_GET['division']) && $_GET['division'] !== '' ? $_GET['division'] : null;
 $showin_home = isset($_GET['showin_home']) && $_GET['showin_home'] !== '' ? $_GET['showin_home'] : null;
 
-// Base query: fetch only active products
-$sql = "SELECT * FROM products WHERE status = 'active'";
+// ✅ Pagination defaults
+$page = isset($_GET['page']) && is_numeric($_GET['page']) ? intval($_GET['page']) : 1;
+$limit = isset($_GET['limit']) && is_numeric($_GET['limit']) ? intval($_GET['limit']) : 10;
+$offset = ($page - 1) * $limit;
+
+// Base query
+$sqlBase = "FROM products WHERE status = 'active'";
 
 // Add filters dynamically
 if ($category != null) {
     $category = $conn->real_escape_string($category);
-    $sql .= " AND category = '$category'";
+    $sqlBase .= " AND category = '$category'";
 }
 
-if ($targetspecies && $targetspecies!=='All') {
+if ($targetspecies && $targetspecies !== 'All') {
     $targetspecies = $conn->real_escape_string($targetspecies);
-    // Use FIND_IN_SET for comma-separated values in targetspecies column
-    $sql .= " AND FIND_IN_SET('$targetspecies', targetspecies) > 0";
+    $sqlBase .= " AND FIND_IN_SET('$targetspecies', targetspecies) > 0";
 }
 
 if ($division) {
     $division = $conn->real_escape_string($division);
-    $sql .= " AND division = '$division'";
+    $sqlBase .= " AND division = '$division'";
 }
+
 if ($showin_home) {
-   $sql = "SELECT * FROM products WHERE showin_home = 'active'";
-
+    $sqlBase = "FROM products WHERE showin_home = 'active'";
 }
-$sql .= " ORDER BY created_at DESC";
 
-// Debug: Log the final SQL query
+// ✅ Count total records
+$countQuery = "SELECT COUNT(*) AS total " . $sqlBase;
+$countResult = $conn->query($countQuery);
+$totalRecords = ($countResult && $countResult->num_rows > 0) ? $countResult->fetch_assoc()['total'] : 0;
+
+// ✅ Fetch paginated data
+$sql = "SELECT * " . $sqlBase . " ORDER BY created_at DESC LIMIT $limit OFFSET $offset";
 error_log("SQL Query: " . $sql);
 
 $result = $conn->query($sql);
@@ -45,11 +54,16 @@ if ($result && $result->num_rows > 0) {
     }
 }
 
+// ✅ Calculate pagination meta
+$totalPages = ceil($totalRecords / $limit);
+
 echo json_encode([
     "status" => "success",
-   
     "count" => count($products),
+    "total_records" => $totalRecords,
+    "total_pages" => $totalPages,
+    "current_page" => $page,
+    "limit" => $limit,
     "data" => $products
 ]);
-
 ?>
