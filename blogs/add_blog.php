@@ -11,6 +11,8 @@ if (!is_dir($uploadDir)) {
 $title = $_POST['title'] ?? '';
 $slug = $_POST['slug'] ?? '';
 $description = $_POST['description'] ?? '';
+$meta_title = $_POST['meta_title'] ?? '';
+$meta_description = $_POST['meta_description'] ?? '';
 $status = $_POST['status'] ?? '';
 $subdes1 = $_POST['subdes1'] ?? '';
 $subdes2 = $_POST['subdes2'] ?? '';
@@ -66,14 +68,16 @@ $sub_image7 = saveImage("sub_image7", $uploadDir);
 $sub_image8 = saveImage("sub_image8", $uploadDir);
 
 // Insert
-$stmt = $conn->prepare("INSERT INTO blogs (id, title, slug, status, description, subdes1, subdes2, subdes3,subdes4, subdes5, subdes6,subdes7,subdes8, image, banner_image, sub_image1, sub_image2, sub_image3, sub_image4, sub_image5, sub_image6,sub_image7,sub_image8,imagealt,banneralt,imagealt1, imagealt2, imagealt3,imagealt4, imagealt5, imagealt6,imagealt7,imagealt8) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?, ?, ?,?,?,?,?,?,?,?,?,?,?,?,?)");
+$stmt = $conn->prepare("INSERT INTO blogs (id, title, slug, status, description,meta_title,meta_description, subdes1, subdes2, subdes3,subdes4, subdes5, subdes6,subdes7,subdes8, image, banner_image, sub_image1, sub_image2, sub_image3, sub_image4, sub_image5, sub_image6,sub_image7,sub_image8,imagealt,banneralt,imagealt1, imagealt2, imagealt3,imagealt4, imagealt5, imagealt6,imagealt7,imagealt8) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?, ?, ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
 $stmt->bind_param(
-    "sssssssssssssssssssssssssssssssss",
+    "sssssssssssssssssssssssssssssssssss",
     $blogId,
     $title,
     $slug,
     $status,
     $description,
+    $meta_title,
+    $meta_description,
     $subdes1,
     $subdes2,
     $subdes3,

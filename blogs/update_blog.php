@@ -21,6 +21,8 @@ $title = $_POST['title'] ?? '';
 $slug = $_POST['slug'] ?? '';
 $status = $_POST['status'] ?? '';
 $description = $_POST['description'] ?? '';
+$meta_title = $_POST['meta_title'] ?? '';
+$meta_description = $_POST['meta_description'] ?? '';
 $subdes1 = $_POST['subdes1'] ?? '';
 $subdes2 = $_POST['subdes2'] ?? '';
 $subdes3 = $_POST['subdes3'] ?? '';
@@ -72,9 +74,9 @@ $banner_image = uploadFile("banner_image");
 
 // ✅ Build query dynamically
 $sql = "UPDATE blogs SET 
-    title=?, slug=?, status=?, description=?, subdes1=?, subdes2=?, subdes3=?, subdes4=?, subdes5=?, subdes6=?,subdes7=?,subdes8=?,imagealt=?,banneralt=?,imagealt1=?, imagealt2=?, imagealt3=?,imagealt4=?, imagealt5=?, imagealt6=?,imagealt7=?,imagealt8=?";
+    title=?, slug=?, status=?, description=?,meta_title=?,meta_description=?, subdes1=?, subdes2=?, subdes3=?, subdes4=?, subdes5=?, subdes6=?,subdes7=?,subdes8=?,imagealt=?,banneralt=?,imagealt1=?, imagealt2=?, imagealt3=?,imagealt4=?, imagealt5=?, imagealt6=?,imagealt7=?,imagealt8=?";
 
-$params = [$title, $slug, $status, $description, $subdes1, $subdes2, $subdes3,$subdes4, $subdes5, $subdes6,$subdes7,$subdes8,$imagealt,$banneralt,$imagealt1, $imagealt2, $imagealt3,$imagealt4, $imagealt5, $imagealt6,$imagealt7,$imagealt8];
+$params = [$title, $slug, $status, $description,$meta_title,$meta_description, $subdes1, $subdes2, $subdes3,$subdes4, $subdes5, $subdes6,$subdes7,$subdes8,$imagealt,$banneralt,$imagealt1, $imagealt2, $imagealt3,$imagealt4, $imagealt5, $imagealt6,$imagealt7,$imagealt8];
 
 // Add optional fields
 if ($image) {
