@@ -19,17 +19,19 @@ $gallery_images = [];
 $uploadDir = __DIR__ . "/../uploads/";
 
 if (!is_dir($uploadDir)) {
-    mkdir($uploadDir, 0777, true); // auto-create if missing
+    mkdir($uploadDir, 0777, true);
 }
-// handle file uploads
+
+// Single image
 if (!empty($_FILES['image']['name'])) {
     $filename = time() . "_" . basename($_FILES['image']['name']);
     $targetPath = $uploadDir . $filename;
     if (move_uploaded_file($_FILES['image']['tmp_name'], $targetPath)) {
-        $image = "uploads/" . $filename; // store relative path in DB
+        $image = "uploads/" . $filename;
     }
 }
-// ✅ Handle multiple other images
+
+// Multiple gallery images
 if (!empty($_FILES['gallery_images']['name'][0])) {
     foreach ($_FILES['gallery_images']['name'] as $key => $val) {
         if (!empty($val)) {
@@ -41,20 +43,21 @@ if (!empty($_FILES['gallery_images']['name'][0])) {
         }
     }
 }
-// Generate unique event ID
-$id = generateUniqueEventId($conn);
+
 $gallery_images_json = json_encode($gallery_images);
 
-$sql="INSERT INTO events (id, title, description, status, slug, image,gallery_images)VALUES (?, ?, ?, ?, ?, ?,?)";
-// Insert into DB
-$stmt =$conn->prepare($sql);
-$stmt->bind_param("sssssss", $id, $title, $description, $status, $slug, $image,$gallery_images_json);
+// ❌ Remove `id` from insert
+$sql = "INSERT INTO events (title, description, status, slug, image, gallery_images) VALUES (?, ?, ?, ?, ?, ?)";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("ssssss", $title, $description, $status, $slug, $image, $gallery_images_json);
 
 if ($stmt->execute()) {
-    echo json_encode(["status" => "success", "message" => "Event added successfully", "id" => $id]);
+    $insertedId = $conn->insert_id; // ✅ Auto-generated ID
+    echo json_encode(["status" => "success", "message" => "Event added successfully", "id" => $insertedId]);
 } else {
     echo json_encode(["status" => "error", "message" => $stmt->error]);
 }
+
 $stmt->close();
 $conn->close();
 ?>

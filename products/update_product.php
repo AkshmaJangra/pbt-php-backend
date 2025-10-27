@@ -72,6 +72,11 @@ foreach ($singleFiles as $fileKey) {
         }
 
         if (move_uploaded_file($_FILES[$fileKey]['tmp_name'], $targetPath)) {
+            // Delete old file if exists
+            if (!empty($current[$fileKey]) && file_exists(__DIR__ . "/../" . $current[$fileKey])) {
+                unlink(__DIR__ . "/../" . $current[$fileKey]);
+            }
+            
             $fields[] = "$fileKey=?";
             $params[] = "uploads/" . $filename;
             $types .= "s";
@@ -79,28 +84,88 @@ foreach ($singleFiles as $fileKey) {
     }
 }
 
-// 3️⃣ Handle multiple other_images
-$other_images = json_decode($current['other_images'] ?? '[]', true);
+// 3️⃣ Handle multiple other_images with delete functionality
+$shouldUpdateOtherImages = false;
+$other_images = [];
 
+// Get current images from database
+$current_images = json_decode($current['other_images'] ?? '[]', true);
+if (!is_array($current_images)) {
+    $current_images = [];
+}
+
+// Check if we have existing_other_images (images to keep)
+if (isset($_POST['existing_other_images']) && !empty($_POST['existing_other_images'])) {
+    $existing = json_decode($_POST['existing_other_images'], true);
+    if (is_array($existing)) {
+        $other_images = $existing;
+        $shouldUpdateOtherImages = true;
+    }
+} else {
+    // If existing_other_images is empty or not set, start with empty array
+    // This means user wants to remove all existing images
+    if (isset($_POST['existing_other_images'])) {
+        $other_images = [];
+        $shouldUpdateOtherImages = true;
+    } else {
+        // If not sent at all, keep current ones
+        $other_images = $current_images;
+    }
+}
+
+// Delete images that are in current but not in existing (images to delete)
+if (isset($_POST['delete_other_images']) && !empty($_POST['delete_other_images'])) {
+    $toDelete = json_decode($_POST['delete_other_images'], true);
+    if (is_array($toDelete)) {
+        foreach ($toDelete as $imgPath) {
+            // Clean the path - remove backslashes
+            $cleanPath = str_replace("\\", "", $imgPath);
+            $fullPath = __DIR__ . "/../" . $cleanPath;
+            
+            if (file_exists($fullPath)) {
+                unlink($fullPath);
+            }
+        }
+        $shouldUpdateOtherImages = true;
+    }
+}
+
+// Add new uploaded images
 if (!empty($_FILES['other_images']['name'])) {
-    $names = is_array($_FILES['other_images']['name']) ? $_FILES['other_images']['name'] : [$_FILES['other_images']['name']];
-    $tmp_names = is_array($_FILES['other_images']['tmp_name']) ? $_FILES['other_images']['tmp_name'] : [$_FILES['other_images']['tmp_name']];
+    $names = $_FILES['other_images']['name'];
+    $tmp_names = $_FILES['other_images']['tmp_name'];
+    $errors = $_FILES['other_images']['error'];
+    
+    // Handle both single and multiple file uploads
+    if (!is_array($names)) {
+        $names = [$names];
+        $tmp_names = [$tmp_names];
+        $errors = [$errors];
+    }
 
     foreach ($names as $i => $name) {
-        if (!empty($name)) {
-            $filename = time() . "_" . basename($name);
-            $targetPath = $uploadDir . $filename;
-            if (move_uploaded_file($tmp_names[$i], $targetPath)) {
-                $other_images[] = "uploads/" . $filename;
+        if (!empty($name) && $errors[$i] === UPLOAD_ERR_OK && !empty($tmp_names[$i])) {
+            $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
+            $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+            
+            if (in_array($ext, $allowed)) {
+                $filename = time() . "_" . uniqid() . "_" . basename($name);
+                $targetPath = $uploadDir . $filename;
+                
+                if (move_uploaded_file($tmp_names[$i], $targetPath)) {
+                    $other_images[] = "uploads/" . $filename;
+                    $shouldUpdateOtherImages = true;
+                }
             }
         }
     }
+}
 
-    if (!empty($other_images)) {
-        $fields[] = "other_images=?";
-        $params[] = json_encode($other_images);
-        $types .= "s";
-    }
+// Update other_images field if there were any changes
+if ($shouldUpdateOtherImages) {
+    $fields[] = "other_images=?";
+    $params[] = json_encode($other_images);
+    $types .= "s";
 }
 
 // 4️⃣ Nothing to update
