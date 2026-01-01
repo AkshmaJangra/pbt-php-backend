@@ -22,6 +22,8 @@ $subdes5 = $_POST['subdes5'] ?? '';
 $subdes6 = $_POST['subdes6'] ?? '';
 $subdes7 = $_POST['subdes7'] ?? '';
 $subdes8 = $_POST['subdes8'] ?? '';
+$subdes9 = $_POST['subdes9'] ?? '';
+$subdes10 = $_POST['subdes10'] ?? '';
 $imagealt=$_POST['imagealt']??'';
 $banneralt=$_POST['banneralt']??'';
 $imagealt1 = $_POST['imagealt1'] ?? '';
@@ -32,6 +34,8 @@ $imagealt5 = $_POST['imagealt5'] ?? '';
 $imagealt6 = $_POST['imagealt6'] ?? '';
 $imagealt7 = $_POST['imagealt7'] ?? '';
 $imagealt8 = $_POST['imagealt8'] ?? '';
+$imagealt9 = $_POST['imagealt9'] ?? '';
+$imagealt10 = $_POST['imagealt10'] ?? '';
 
 // Generate unique blog ID (5 chars)
 function generateUniqueBlogId($conn) {
@@ -66,11 +70,13 @@ $sub_image5 = saveImage("sub_image5", $uploadDir);
 $sub_image6 = saveImage("sub_image6", $uploadDir);
 $sub_image7 = saveImage("sub_image7", $uploadDir);
 $sub_image8 = saveImage("sub_image8", $uploadDir);
+$sub_image9 = saveImage("sub_image9", $uploadDir);
+$sub_image10 = saveImage("sub_image10", $uploadDir);
 
 // Insert
-$stmt = $conn->prepare("INSERT INTO blogs (id, title, slug, status, description,meta_title,meta_description, subdes1, subdes2, subdes3,subdes4, subdes5, subdes6,subdes7,subdes8, image, banner_image, sub_image1, sub_image2, sub_image3, sub_image4, sub_image5, sub_image6,sub_image7,sub_image8,imagealt,banneralt,imagealt1, imagealt2, imagealt3,imagealt4, imagealt5, imagealt6,imagealt7,imagealt8) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?, ?, ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+$stmt = $conn->prepare("INSERT INTO blogs (id, title, slug, status, description,meta_title,meta_description, subdes1, subdes2, subdes3,subdes4, subdes5, subdes6,subdes7,subdes8,subdes9,subdes10, image, banner_image, sub_image1, sub_image2, sub_image3, sub_image4, sub_image5, sub_image6,sub_image7,sub_image8,sub_image9,sub_image10,imagealt,banneralt,imagealt1, imagealt2, imagealt3,imagealt4, imagealt5, imagealt6,imagealt7,imagealt8,imagealt9,imagealt10) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?, ?, ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
 $stmt->bind_param(
-    "sssssssssssssssssssssssssssssssssss",
+    "sssssssssssssssssssssssssssssssssssssss",
     $blogId,
     $title,
     $slug,
@@ -86,6 +92,8 @@ $stmt->bind_param(
     $subdes6,
     $subdes7,
     $subdes8,
+    $subdes9,
+    $subdes10,
     $image,
     $banner_image,
     $sub_image1,
@@ -96,6 +104,8 @@ $stmt->bind_param(
     $sub_image6,
     $sub_image7,
     $sub_image8,
+    $sub_image9,
+    $sub_image10,
     $imagealt,
     $banneralt,
      $imagealt1,
@@ -106,6 +116,8 @@ $stmt->bind_param(
     $imagealt6,
     $imagealt7,
     $imagealt8,
+    $imagealt9,
+    $imagealt10,
 
 );
 

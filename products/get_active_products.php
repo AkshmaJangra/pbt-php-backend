@@ -6,11 +6,13 @@ include_once(__DIR__ . "/../conn.php");
 $targetspecies = isset($_GET['targetspecies']) && $_GET['targetspecies'] !== '' ? $_GET['targetspecies'] : null;
 $category = isset($_GET['category']) && $_GET['category'] !== '' ? $_GET['category'] : null;
 $division = isset($_GET['division']) && $_GET['division'] !== '' ? $_GET['division'] : null;
+$domains = isset($_GET['domains']) && $_GET['domains'] !== '' ? $_GET['domains'] : null;
 $showin_home = isset($_GET['showin_home']) && $_GET['showin_home'] !== '' ? $_GET['showin_home'] : null;
+$search = isset($_GET['search']) && $_GET['search'] !== '' ? $_GET['search'] : null;
 
 // ✅ Pagination defaults
 $page = isset($_GET['page']) && is_numeric($_GET['page']) ? intval($_GET['page']) : 1;
-$limit = isset($_GET['limit']) && is_numeric($_GET['limit']) ? intval($_GET['limit']) : 10;
+$limit = isset($_GET['limit']) && is_numeric($_GET['limit']) ? intval($_GET['limit']) : 12;
 $offset = ($page - 1) * $limit;
 
 // Base query
@@ -26,12 +28,20 @@ if ($targetspecies && $targetspecies !== 'All') {
     $targetspecies = $conn->real_escape_string($targetspecies);
     $sqlBase .= " AND FIND_IN_SET('$targetspecies', targetspecies) > 0";
 }
+if ($domains && $domains !== 'All') {
+    $domains = $conn->real_escape_string($domains);
+    $sqlBase .= " AND FIND_IN_SET('$domains', domains) > 0";
+}
 
 if ($division) {
     $division = $conn->real_escape_string($division);
     $sqlBase .= " AND division = '$division'";
 }
 
+if ($search) {
+    $search = $conn->real_escape_string($search);
+    $sqlBase .= " AND (title LIKE '%$search%' OR category LIKE '%$search%' OR description LIKE '%$search%')";
+}
 if ($showin_home) {
     $sqlBase = "FROM products WHERE showin_home = 'active'";
 }

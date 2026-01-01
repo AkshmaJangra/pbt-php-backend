@@ -17,7 +17,6 @@ $email = $input['email'] ?? '';
 $mobile = $input['mobile'] ?? '';
 $message = $input['message'] ?? '';
 
-
 // generate unique ID
 $id = generateUniqueContactusId($conn);
 

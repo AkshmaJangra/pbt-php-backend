@@ -31,6 +31,8 @@ $subdes5 = $_POST['subdes5'] ?? '';
 $subdes6 = $_POST['subdes6'] ?? '';
 $subdes7 = $_POST['subdes7'] ?? '';
 $subdes8 = $_POST['subdes8'] ?? '';
+$subdes9 = $_POST['subdes9'] ?? '';
+$subdes10 = $_POST['subdes10'] ?? '';
 $imagealt=$_POST['imagealt']??'';
 $banneralt=$_POST['banneralt']??'';
 $imagealt1 = $_POST['imagealt1'] ?? '';
@@ -41,7 +43,8 @@ $imagealt5 = $_POST['imagealt5'] ?? '';
 $imagealt6 = $_POST['imagealt6'] ?? '';
 $imagealt7 = $_POST['imagealt7'] ?? '';
 $imagealt8 = $_POST['imagealt8'] ?? '';
-
+$imagealt9 = $_POST['imagealt9'] ?? '';
+$imagealt10 = $_POST['imagealt10'] ?? '';
 // ✅ Directory for uploads
 $uploadDir = __DIR__ . "/../uploads/";
 if (!file_exists($uploadDir)) {
@@ -70,13 +73,15 @@ $sub_image5 = uploadFile("sub_image5");
 $sub_image6 = uploadFile("sub_image6");
 $sub_image7 = uploadFile("sub_image7");
 $sub_image8 = uploadFile("sub_image8");
+$sub_image9 = uploadFile("sub_image9");
+$sub_image10 = uploadFile("sub_image10");
 $banner_image = uploadFile("banner_image");
 
 // ✅ Build query dynamically
 $sql = "UPDATE blogs SET 
-    title=?, slug=?, status=?, description=?,meta_title=?,meta_description=?, subdes1=?, subdes2=?, subdes3=?, subdes4=?, subdes5=?, subdes6=?,subdes7=?,subdes8=?,imagealt=?,banneralt=?,imagealt1=?, imagealt2=?, imagealt3=?,imagealt4=?, imagealt5=?, imagealt6=?,imagealt7=?,imagealt8=?";
+    title=?, slug=?, status=?, description=?,meta_title=?,meta_description=?, subdes1=?, subdes2=?, subdes3=?, subdes4=?, subdes5=?, subdes6=?,subdes7=?,subdes8=?,subdes9=?,subdes10=?, imagealt=?,banneralt=?,imagealt1=?, imagealt2=?, imagealt3=?,imagealt4=?, imagealt5=?, imagealt6=?,imagealt7=?,imagealt8=?,imagealt9=?,imagealt10=?";
 
-$params = [$title, $slug, $status, $description,$meta_title,$meta_description, $subdes1, $subdes2, $subdes3,$subdes4, $subdes5, $subdes6,$subdes7,$subdes8,$imagealt,$banneralt,$imagealt1, $imagealt2, $imagealt3,$imagealt4, $imagealt5, $imagealt6,$imagealt7,$imagealt8];
+$params = [$title, $slug, $status, $description,$meta_title,$meta_description, $subdes1, $subdes2, $subdes3,$subdes4, $subdes5, $subdes6,$subdes7,$subdes8,$subdes9,$subdes10,$imagealt,$banneralt,$imagealt1, $imagealt2, $imagealt3,$imagealt4, $imagealt5, $imagealt6,$imagealt7,$imagealt8,$imagealt9,$imagealt10];
 
 // Add optional fields
 if ($image) {
@@ -114,6 +119,14 @@ if ($sub_image7) {
 if ($sub_image8) {
     $sql .= ", sub_image8=?";
     $params[] = $sub_image8;
+}
+if ($sub_image9) {
+    $sql .= ", sub_image9=?";
+    $params[] = $sub_image9;
+}
+if ($sub_image10) {
+    $sql .= ", sub_image10=?";
+    $params[] = $sub_image10;
 }
 if ($banner_image) {
     $sql .= ", banner_image=?";

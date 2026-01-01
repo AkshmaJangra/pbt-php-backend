@@ -39,7 +39,7 @@ $types = "";
 
 // 1️⃣ Update normal fields
 $updatableFields = [
-    'title','status','showin_home','description','category','division','targetspecies',
+    'title','status','showin_home','description','category','division','targetspecies','domains',
     'indications','composition','dosages','packsize','pharmacautionform','slug',
     'meta_description','meta_title'
 ];

@@ -18,6 +18,7 @@ $status = $_POST['status'] ?? null;
 $showin_home = $_POST['showin_home'] ?? null;
 $description = $_POST['description'] ?? null;
 $targetspecies = $_POST['targetspecies'] ?? 'All';
+$domains = $_POST['domains'] ?? '';
 $category = $_POST['category'] ?? null;
 $division = $_POST['division'] ?? null;
 $indications = $_POST['indications'] ?? null;
@@ -95,12 +96,12 @@ $id = generateUniqueProductId($conn);
 $other_images_json = json_encode($other_images);
 
 $sql = "INSERT INTO products 
-(id, title, status,showin_home, description, category, division, targetspecies, indications, composition, dosages, packsize, pharmacautionform, slug, image, icon_image, other_images, pack_insert, technical_enquiry,meta_description,meta_title) 
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?)";
+(id, title, status,showin_home, description, category, division, targetspecies, domains,indications, composition, dosages, packsize, pharmacautionform, slug, image, icon_image, other_images, pack_insert, technical_enquiry,meta_description,meta_title) 
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?)";
 
 $stmt = $conn->prepare($sql);
 $stmt->bind_param(
-   "sssssssssssssssssssss", // 18 fields
+   "ssssssssssssssssssssss", // 18 fields
     $id,
     $title,
     $status,
@@ -109,6 +110,7 @@ $stmt->bind_param(
     $category,
     $division,
     $targetspecies,
+    $domains,
     $indications,
     $composition,
     $dosages,
